@@ -76,15 +76,15 @@ isort:
 .PHONY: isort
 
 tests:
-	$(PYTEST_VENV_EXE) -s -vv --ds=${DJANGO_SETTINGS_TEST} tests/
+	$(PYTEST_VENV_EXE) -s -vv tests/
 .PHONY: tests
 
 tests_lf:
-	$(PYTEST_VENV_EXE) -s -vv --ds=${DJANGO_SETTINGS_TEST} --lf tests/
+	$(PYTEST_VENV_EXE) -s -vv --lf tests/
 .PHONY: tests_lf
 
 tests_lf_pdb:
-	$(PYTEST_VENV_EXE) -s -vv --ds=${DJANGO_SETTINGS_TEST} --lf --pdb tests/
+	$(PYTEST_VENV_EXE) -s -vv --lf --pdb tests/
 .PHONY: tests_lf_pdb
 
 qa: black_diff flake
