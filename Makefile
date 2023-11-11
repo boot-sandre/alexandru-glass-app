@@ -23,7 +23,7 @@ install: venv
 .PHONY: install
 
 install_dev: venv
-	$(PIP_VENV_EXE) install -r requirements-dev.txt
+	$(PIP_VENV_EXE) install -r requirements-dev.txt -r requirements.txt
 .PHONY: install_dev
 
 freeze_requirements: venv
