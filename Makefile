@@ -6,6 +6,7 @@ PYTHON_VENV_EXE := $(VENV)/bin/python
 PIP_VENV_EXE := $(VENV)/bin/pip
 BLACK_VENV_EXE := $(VENV)/bin/black
 FLAKE_VENV_EXE := $(VENV)/bin/flake8
+ISORT_VENV_EXE := $(VENV)/bin/isort
 PYTEST_VENV_EXE := $(VENV)/bin/pytest
 DJANGO_SETTINGS := alexandru_optica_app.settings.development
 DJANGO_SETTINGS_TEST := alexandru_optica_app.settings.testing
@@ -59,16 +60,20 @@ static:
 .PHONY: static
 
 black_diff:
-	$(BLACK_VENV_EXE) -t $(PYTHON_BLACK_VERSION) --extend-exclude='/*/migrations/*|/.venv' --diff .
+	$(BLACK_VENV_EXE) -t $(PYTHON_BLACK_VERSION) --diff .
 .PHONY: black_diff
 
 black_apply:
-	$(BLACK_VENV_EXE) -t $(PYTHON_BLACK_VERSION) --extend-exclude='/*/migrations/*|/.venv' .
+	$(BLACK_VENV_EXE) -t $(PYTHON_BLACK_VERSION) .
 .PHONY: black_apply
 
 flake:
-	$(FLAKE_VENV_EXE) $(QA_PATHS) --extend-exclude=.venv,migrations .
+	$(FLAKE_VENV_EXE) $(QA_PATHS) .
 .PHONY: flake
+
+isort:
+	$(ISORT_VENV_EXE) .
+.PHONY: isort
 
 tests:
 	$(PYTEST_VENV_EXE) -s -vv --ds=${DJANGO_SETTINGS_TEST} tests/

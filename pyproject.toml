@@ -19,4 +19,7 @@ exclude = ".venv,migrations,static,templates,tools"
 [tool.isort]
 profile = "black"
 line_length = 88
+multi_line_output = 3
+include_trailing_comma = true
 virtual_env = ".venv"
+skip_glob = ["**/migrations/*.py"]
