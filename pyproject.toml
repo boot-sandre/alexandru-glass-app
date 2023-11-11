@@ -12,10 +12,6 @@ exclude = '''
 )/
 '''
 
-[tool.flake8]
-max-line-length = 88
-exclude = ".venv,migrations,static,templates,tools"
-
 [tool.isort]
 profile = "black"
 line_length = 88

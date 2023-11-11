@@ -19,13 +19,6 @@ from .models import (
     Product,
 )
 
-"""
-@admin.register(Order)
-class OrderAdmin(admin.ModelAdmin):
-    list_display = ('__str__', 'created_at', 'updated_at')  # Replace 'other_field' with other relevant fields of the Order model
-    search_fields = ('id',)  # Allow searching by order ID
-"""
-
 
 @admin.register(PrescriptionDetail)
 class PrescriptionDetailAdmin(admin.ModelAdmin):
@@ -35,13 +28,13 @@ class PrescriptionDetailAdmin(admin.ModelAdmin):
         "aproape_pupillary_distance",
         "intermediar_pupillary_distance",
     )
-    list_filter = ("order",)  # Allows filtering by the related order
+    list_filter = ("order",)
     search_fields = (
         "order__id",
         "fare_od_spheric",
         "fare_os_spheric",
-    )  # Allows searching by related order ID and spheric values
-    raw_id_fields = ("order",)  # Helpful if there are many orders to choose from
+    )
+    raw_id_fields = ("order",)
     fieldsets = (
         ("Order Info", {"fields": ("order",)}),
         (
@@ -85,7 +78,6 @@ class PrescriptionDetailAdmin(admin.ModelAdmin):
     )
 
     def get_changeform_initial_data(self, request):
-        # Set the initial value for the 'order' field to the most recent Order
         last_order = Order.objects.order_by("-id").first()
         if last_order:
             return {"order": last_order.pk}
@@ -124,17 +116,13 @@ class IdentityAdmin(admin.ModelAdmin):
     def created(self, obj):
         return obj.order.created
 
-    created.admin_order_field = (
-        "order__created"  # Allows sorting by the 'created' timestamp
-    )
+    created.admin_order_field = "order__created"
     created.short_description = "Created"
 
     def modified(self, obj):
         return obj.order.modified
 
-    modified.admin_order_field = (
-        "order__modified"  # Allows sorting by the 'modified' timestamp
-    )
+    modified.admin_order_field = "order__modified"
     modified.short_description = "Modified"
 
 
@@ -145,7 +133,6 @@ class ContactAdmin(admin.ModelAdmin):
     raw_id_fields = ("order",)
 
     def get_changeform_initial_data(self, request):
-        # Set the initial value for the 'order' field to the most recent Order
         last_order = Order.objects.order_by("-id").first()
         if last_order:
             return {"order": last_order.pk}
@@ -159,21 +146,18 @@ class InstitutionAdmin(admin.ModelAdmin):
     raw_id_fields = ("order",)
 
     def address_preview(self, obj):
-        return truncatechars(obj.address, 50)  # Show up to 50 characters of the address
+        return truncatechars(obj.address, 50)
 
     address_preview.short_description = "Address"
 
     def get_changeform_initial_data(self, request):
-        # Set the initial value for the 'order' field to the most recent Order
         last_order = Order.objects.order_by("-id").first()
         if last_order:
             return {"order": last_order.pk}
         return {}
 
 
-class IdentityInline(
-    admin.TabularInline
-):  # or admin.StackedInline for a different layout
+class IdentityInline(admin.TabularInline):
     model = Identity
     extra = 1
 
@@ -233,7 +217,6 @@ class PrescriptionDetailsInline(admin.StackedInline):
     )
 
 
-# Add other inlines for your submodels here
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
     inlines = [

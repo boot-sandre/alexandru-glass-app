@@ -68,7 +68,7 @@ black_apply:
 .PHONY: black_apply
 
 flake:
-	$(FLAKE_VENV_EXE) $(QA_PATHS) .
+	$(FLAKE_VENV_EXE) .
 .PHONY: flake
 
 isort:
