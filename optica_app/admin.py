@@ -8,15 +8,15 @@ from django.contrib import admin
 from django.template.defaultfilters import truncatechars
 
 from .models import (
+    Contact,
+    Frame,
+    GlassType,
+    Identity,
+    Institution,
+    Lens,
     Order,
     PrescriptionDetail,
-    Identity,
-    Contact,
-    Institution,
-    GlassType,
-    Lens,
     Product,
-    Frame,
 )
 
 """
