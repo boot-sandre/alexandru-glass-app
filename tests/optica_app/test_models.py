@@ -1,5 +1,6 @@
 import pytest
-from optica_app.factory import OrderFactory, IdentityFactory, ContactFactory, InstitutionFactory, PrescriptionDetailFactory
+from optica_app.factory import OrderFactory, IdentityFactory, ContactFactory, InstitutionFactory, PrescriptionDetailFactory, ProductFactory, FrameFactory, GlassTypeFactory, LensFactory
+
 
 @pytest.mark.django_db
 def test_order_creation():
@@ -63,3 +64,16 @@ def test_prescription_detail_creation():
     assert 0 <= prescription_detail.intermediar_os_axis <= 180, "intermediar_os_axis should be within the range 0 to 180"
 
     assert 50.0 <= prescription_detail.intermediar_pupillary_distance <= 70.0, "intermediar_pupillary_distance should be within the range 50.0 to 70.0"
+
+
+@pytest.mark.django_db
+def test_create_product_with_related_entities():
+    # This will also create related Order, Frame, GlassType, and Lens instances
+    product = ProductFactory()
+
+    # Assertions to ensure everything was created correctly
+    assert product.pk is not None
+    assert product.frame is not None
+    assert product.glasstype is not None
+    assert product.lens is not None
+    assert str(product) == f"{product.frame.title} - {product.total_price}"

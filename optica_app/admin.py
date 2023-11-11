@@ -217,17 +217,6 @@ class PrescriptionDetailsInline(admin.StackedInline):
     )
 
 
-@admin.register(Order)
-class OrderAdmin(admin.ModelAdmin):
-    list_display = ["user", "created_at", "updated_at"]
-    inlines = [
-        IdentityInline,
-        ContactInline,
-        InstitutionInline,
-        PrescriptionDetailsInline,
-    ]
-
-
 class FrameInline(admin.StackedInline):
     model = Frame
     can_delete = False
@@ -250,6 +239,23 @@ class ProductAdmin(admin.ModelAdmin):
         LensInline,
     ]
     list_display = ("__str__", "total_price")
+
+
+class ProductInline(admin.TabularInline):  # You can also use admin.StackedInline if you prefer
+    model = Product
+    extra = 1
+
+
+@admin.register(Order)
+class OrderAdmin(admin.ModelAdmin):
+    list_display = ["user", "created_at", "updated_at"]
+    inlines = [
+        IdentityInline,
+        ContactInline,
+        InstitutionInline,
+        PrescriptionDetailsInline,
+        ProductInline,
+    ]
 
 
 admin.site.register(Product, ProductAdmin)

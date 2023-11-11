@@ -7,7 +7,7 @@
 import factory
 from factory import fuzzy
 
-from .models import Contact, Identity, Institution, Order, PrescriptionDetail
+from .models import Contact, Identity, Institution, Order, PrescriptionDetail, Lens, GlassType, Frame, Product
 
 # factories.py
 import factory
@@ -102,3 +102,51 @@ class PrescriptionDetailFactory(factory.django.DjangoModelFactory):
     intermediar_os_axis = fuzzy.FuzzyInteger(0, 180)
 
     intermediar_pupillary_distance = fuzzy.FuzzyDecimal(50.0, 70.0, 1)
+
+
+class ProductFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Product
+
+    order = factory.SubFactory(OrderFactory)
+    total_price = fuzzy.FuzzyDecimal(0.01, 1000.00, 2)
+
+    @factory.post_generation
+    def post_create(self, create, extracted, **kwargs):
+        if not create:
+            # Simple build, do nothing.
+            return
+
+        # Assuming that each Product should have one Frame, one GlassType, and one Lens
+        Frame.objects.create(product=self, title=f"Frame for product {self.pk}")
+        GlassType.objects.create(
+            product=self,
+            distance=fuzzy.FuzzyChoice([choice[0] for choice in GlassType.DISTANCE_CHOICES]).fuzz(),
+            treatment=fuzzy.FuzzyChoice([choice[0] for choice in GlassType.TREATMENT_CHOICES]).fuzz()
+        )
+        Lens.objects.create(product=self, title=f"Lens for product {self.pk}")
+
+
+class FrameFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Frame
+
+    product = factory.SubFactory(ProductFactory)
+    title = factory.Sequence(lambda n: f"Frame Title {n}")
+
+
+class GlassTypeFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = GlassType
+
+    product = factory.SubFactory(ProductFactory)
+    distance = fuzzy.FuzzyChoice(choices=[choice[0] for choice in GlassType.DISTANCE_CHOICES])
+    treatment = fuzzy.FuzzyChoice(choices=[choice[0] for choice in GlassType.TREATMENT_CHOICES], getter=lambda c: c if c is not None else '')
+
+
+class LensFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Lens
+
+    product = factory.SubFactory(ProductFactory)
+    title = factory.Faker('text', max_nb_chars=200)
