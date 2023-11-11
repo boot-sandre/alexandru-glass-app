@@ -21,7 +21,9 @@ class Order(models.Model):
 
 
 class Identity(models.Model):
-    order = models.OneToOneField(Order, on_delete=models.CASCADE, related_name='identities')
+    order = models.OneToOneField(
+        Order, on_delete=models.CASCADE, related_name="identities"
+    )
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
 
@@ -34,10 +36,16 @@ class Identity(models.Model):
 
 
 class Contact(models.Model):
-    order = models.OneToOneField(Order, on_delete=models.CASCADE, related_name='contacts')
-    phone_regex = RegexValidator(regex=r'^\+?1?\d{9,15}$',
-                                 message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed.")
-    phone_number = models.CharField(validators=[phone_regex], max_length=17, blank=True)  # validators should be a list
+    order = models.OneToOneField(
+        Order, on_delete=models.CASCADE, related_name="contacts"
+    )
+    phone_regex = RegexValidator(
+        regex=r"^\+?1?\d{9,15}$",
+        message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed.",
+    )
+    phone_number = models.CharField(
+        validators=[phone_regex], max_length=17, blank=True
+    )  # validators should be a list
 
     class Meta:
         verbose_name = "Contact"
@@ -48,7 +56,9 @@ class Contact(models.Model):
 
 
 class Institution(models.Model):
-    order = models.OneToOneField(Order, on_delete=models.CASCADE, related_name='institutions')
+    order = models.OneToOneField(
+        Order, on_delete=models.CASCADE, related_name="institutions"
+    )
     title = models.CharField(max_length=255)
     address = models.TextField()
 
@@ -61,40 +71,72 @@ class Institution(models.Model):
 
 
 class PrescriptionDetail(models.Model):
-    order = models.OneToOneField(Order, on_delete=models.CASCADE, related_name='prescriptions')
+    order = models.OneToOneField(
+        Order, on_delete=models.CASCADE, related_name="prescriptions"
+    )
 
     # Fields for distance vision (Fare)
-    fare_od_spheric = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
-    fare_od_cylindric = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+    fare_od_spheric = models.DecimalField(
+        max_digits=5, decimal_places=2, null=True, blank=True
+    )
+    fare_od_cylindric = models.DecimalField(
+        max_digits=5, decimal_places=2, null=True, blank=True
+    )
     fare_od_axis = models.IntegerField(null=True, blank=True)
 
-    fare_os_spheric = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
-    fare_os_cylindric = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+    fare_os_spheric = models.DecimalField(
+        max_digits=5, decimal_places=2, null=True, blank=True
+    )
+    fare_os_cylindric = models.DecimalField(
+        max_digits=5, decimal_places=2, null=True, blank=True
+    )
     fare_os_axis = models.IntegerField(null=True, blank=True)
 
-    fare_pupillary_distance = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    fare_pupillary_distance = models.DecimalField(
+        max_digits=5, decimal_places=1, null=True, blank=True
+    )
 
     # Fields for near vision (Aproape)
-    aproape_od_spheric = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
-    aproape_od_cylindric = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+    aproape_od_spheric = models.DecimalField(
+        max_digits=5, decimal_places=2, null=True, blank=True
+    )
+    aproape_od_cylindric = models.DecimalField(
+        max_digits=5, decimal_places=2, null=True, blank=True
+    )
     aproape_od_axis = models.IntegerField(null=True, blank=True)
 
-    aproape_os_spheric = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
-    aproape_os_cylindric = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+    aproape_os_spheric = models.DecimalField(
+        max_digits=5, decimal_places=2, null=True, blank=True
+    )
+    aproape_os_cylindric = models.DecimalField(
+        max_digits=5, decimal_places=2, null=True, blank=True
+    )
     aproape_os_axis = models.IntegerField(null=True, blank=True)
 
-    aproape_pupillary_distance = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    aproape_pupillary_distance = models.DecimalField(
+        max_digits=5, decimal_places=1, null=True, blank=True
+    )
 
     # Fields for intermediate vision (Intermediar)
-    intermediar_od_spheric = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
-    intermediar_od_cylindric = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+    intermediar_od_spheric = models.DecimalField(
+        max_digits=5, decimal_places=2, null=True, blank=True
+    )
+    intermediar_od_cylindric = models.DecimalField(
+        max_digits=5, decimal_places=2, null=True, blank=True
+    )
     intermediar_od_axis = models.IntegerField(null=True, blank=True)
 
-    intermediar_os_spheric = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
-    intermediar_os_cylindric = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+    intermediar_os_spheric = models.DecimalField(
+        max_digits=5, decimal_places=2, null=True, blank=True
+    )
+    intermediar_os_cylindric = models.DecimalField(
+        max_digits=5, decimal_places=2, null=True, blank=True
+    )
     intermediar_os_axis = models.IntegerField(null=True, blank=True)
 
-    intermediar_pupillary_distance = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True)
+    intermediar_pupillary_distance = models.DecimalField(
+        max_digits=5, decimal_places=1, null=True, blank=True
+    )
 
     class Meta:
         verbose_name = "Prescription Detail"
@@ -135,4 +177,3 @@ class Lens(models.Model):
 
     def __str__(self):
         return self.title
-

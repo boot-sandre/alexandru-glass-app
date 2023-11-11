@@ -17,6 +17,6 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'alexandru_optica_app.settings')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "alexandru_optica_app.settings")
 
 application = get_wsgi_application()
