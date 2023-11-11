@@ -2,8 +2,8 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at https://mozilla.org/MPL/2.0/.
 # Copyright © Simon ANDRÉ <simon@emencia.com>
-# project: AlexandruGlassApp
-# github: https://github.com/boot-sandre/alexandru-glass-app/
+# project: AlexandruOpticaApp
+# github: https://github.com/boot-sandre/alexandru-optica-app/
 from django.core.validators import RegexValidator
 from django.db import models
 
@@ -21,7 +21,6 @@ class Order(models.Model):
 
 
 class Identity(models.Model):
-    """ Order metadata"""
     order = models.OneToOneField(Order, on_delete=models.CASCADE, related_name='identities')
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
@@ -35,7 +34,6 @@ class Identity(models.Model):
 
 
 class Contact(models.Model):
-    """ Order metadata"""
     order = models.OneToOneField(Order, on_delete=models.CASCADE, related_name='contacts')
     phone_regex = RegexValidator(regex=r'^\+?1?\d{9,15}$',
                                  message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed.")
@@ -50,7 +48,6 @@ class Contact(models.Model):
 
 
 class Institution(models.Model):
-    """ Order metadata"""
     order = models.OneToOneField(Order, on_delete=models.CASCADE, related_name='institutions')
     title = models.CharField(max_length=255)
     address = models.TextField()
@@ -64,7 +61,6 @@ class Institution(models.Model):
 
 
 class PrescriptionDetail(models.Model):
-    """ Order metadata"""
     order = models.OneToOneField(Order, on_delete=models.CASCADE, related_name='prescriptions')
 
     # Fields for distance vision (Fare)

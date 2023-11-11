@@ -2,10 +2,10 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at https://mozilla.org/MPL/2.0/.
 # Copyright © Simon ANDRÉ <simon@emencia.com>
-# project: AlexandruGlassApp
-# github: https://github.com/boot-sandre/alexandru-glass-app/
+# project: AlexandruOpticaApp
+# github: https://github.com/boot-sandre/alexandru-optica-app/
 """
-WSGI config for AlexandruGlassApp project.
+WSGI config for alexandru_optica_app project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 
@@ -17,6 +17,6 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'AlexandruGlassApp.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'alexandru_optica_app.settings')
 
 application = get_wsgi_application()

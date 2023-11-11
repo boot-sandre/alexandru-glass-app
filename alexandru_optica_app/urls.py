@@ -4,3 +4,10 @@
 # Copyright © Simon ANDRÉ <simon@emencia.com>
 # project: AlexandruOpticaApp
 # github: https://github.com/boot-sandre/alexandru-optica-app/
+
+from django.contrib import admin
+from django.urls import path
+
+urlpatterns = [
+    path('', admin.site.urls),
+]
