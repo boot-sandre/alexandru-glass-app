@@ -3,8 +3,9 @@ PYTHON_GLOBAL_EXE := python$(PYTHON_VERSION)
 VENV := .venv
 PYTHON_VENV_EXE := $(VENV)/bin/python
 PIP_VENV_EXE := $(VENV)/bin/pip
-DJANGO_SETTINGS := alexandru_optica_app.settings
+DJANGO_SETTINGS := alexandru_optica_app.settings.development
 DJANGO_SERV_ADDR := localhost:8000
+DB_DEV := db.sqlite3
 
 
 
@@ -12,7 +13,7 @@ venv:
 	$(PYTHON_GLOBAL_EXE) -m venv $(VENV)
 .PHONY: venv
 
-install:
+install: venv
 	$(PIP_VENV_EXE) install -r requirements.txt
 .PHONY: install
 
@@ -20,6 +21,9 @@ clean:
 	rm -rf $(VENV)
 	find . -type f -name '*.pyc' -delete
 .PHONY: clean
+
+clean_db:
+	rm $(DB_DEV)
 
 migrations:
 	$(PYTHON_VENV_EXE) manage.py makemigrations --settings=$(DJANGO_SETTINGS)
