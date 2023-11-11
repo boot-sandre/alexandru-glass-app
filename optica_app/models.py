@@ -4,11 +4,17 @@
 # Copyright © Simon ANDRÉ <simon@emencia.com>
 # project: AlexandruOpticaApp
 # github: https://github.com/boot-sandre/alexandru-optica-app/
-from django.core.validators import RegexValidator
+from decimal import Decimal
+
+from django.contrib.auth import get_user_model
+from django.core.validators import MaxValueValidator, MinValueValidator, RegexValidator
 from django.db import models
 
 
 class Order(models.Model):
+    user = models.ForeignKey(
+        get_user_model(), on_delete=models.CASCADE, related_name="orders"
+    )
     created_at = models.DateTimeField(auto_now_add=True, null=True, editable=False)
     updated_at = models.DateTimeField(auto_now=True, editable=False)
 
@@ -73,68 +79,165 @@ class PrescriptionDetail(models.Model):
     order = models.OneToOneField(
         Order, on_delete=models.CASCADE, related_name="prescriptions"
     )
+    # Validators for the optical range
+    optical_range_validator = [
+        MinValueValidator(Decimal("-20.00")),
+        MaxValueValidator(Decimal("20.00")),
+    ]
+    axis_range_validator = [
+        MinValueValidator(0),
+        MaxValueValidator(180),
+    ]
+    pd_range_validator = [
+        MinValueValidator(Decimal("50.0")),
+        MaxValueValidator(Decimal("70.0")),
+    ]
 
     # Fields for distance vision (Fare)
     fare_od_spheric = models.DecimalField(
-        max_digits=5, decimal_places=2, null=True, blank=True
+        max_digits=5,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        validators=optical_range_validator,
     )
     fare_od_cylindric = models.DecimalField(
-        max_digits=5, decimal_places=2, null=True, blank=True
+        max_digits=5,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        validators=optical_range_validator,
     )
-    fare_od_axis = models.IntegerField(null=True, blank=True)
+    fare_od_axis = models.IntegerField(
+        null=True,
+        blank=True,
+        validators=axis_range_validator,
+    )
 
     fare_os_spheric = models.DecimalField(
-        max_digits=5, decimal_places=2, null=True, blank=True
+        max_digits=5,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        validators=optical_range_validator,
     )
     fare_os_cylindric = models.DecimalField(
-        max_digits=5, decimal_places=2, null=True, blank=True
+        max_digits=5,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        validators=optical_range_validator,
     )
-    fare_os_axis = models.IntegerField(null=True, blank=True)
+    fare_os_axis = models.IntegerField(
+        null=True,
+        blank=True,
+        validators=axis_range_validator,
+    )
 
     fare_pupillary_distance = models.DecimalField(
-        max_digits=5, decimal_places=1, null=True, blank=True
+        max_digits=5,
+        decimal_places=1,
+        null=True,
+        blank=True,
+        validators=pd_range_validator,
     )
 
     # Fields for near vision (Aproape)
     aproape_od_spheric = models.DecimalField(
-        max_digits=5, decimal_places=2, null=True, blank=True
+        max_digits=5,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        validators=optical_range_validator,
     )
     aproape_od_cylindric = models.DecimalField(
-        max_digits=5, decimal_places=2, null=True, blank=True
+        max_digits=5,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        validators=optical_range_validator,
     )
-    aproape_od_axis = models.IntegerField(null=True, blank=True)
+    aproape_od_axis = models.IntegerField(
+        null=True,
+        blank=True,
+        validators=axis_range_validator,
+    )
 
     aproape_os_spheric = models.DecimalField(
-        max_digits=5, decimal_places=2, null=True, blank=True
+        max_digits=5,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        validators=optical_range_validator,
     )
     aproape_os_cylindric = models.DecimalField(
-        max_digits=5, decimal_places=2, null=True, blank=True
+        max_digits=5,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        validators=optical_range_validator,
     )
-    aproape_os_axis = models.IntegerField(null=True, blank=True)
+    aproape_os_axis = models.IntegerField(
+        null=True,
+        blank=True,
+        validators=axis_range_validator,
+    )
 
     aproape_pupillary_distance = models.DecimalField(
-        max_digits=5, decimal_places=1, null=True, blank=True
+        max_digits=5,
+        decimal_places=1,
+        null=True,
+        blank=True,
+        validators=pd_range_validator,
     )
 
     # Fields for intermediate vision (Intermediar)
     intermediar_od_spheric = models.DecimalField(
-        max_digits=5, decimal_places=2, null=True, blank=True
+        max_digits=5,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        validators=optical_range_validator,
     )
     intermediar_od_cylindric = models.DecimalField(
-        max_digits=5, decimal_places=2, null=True, blank=True
+        max_digits=5,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        validators=optical_range_validator,
     )
-    intermediar_od_axis = models.IntegerField(null=True, blank=True)
+    intermediar_od_axis = models.IntegerField(
+        null=True,
+        blank=True,
+        validators=axis_range_validator,
+    )
 
     intermediar_os_spheric = models.DecimalField(
-        max_digits=5, decimal_places=2, null=True, blank=True
+        max_digits=5,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        validators=optical_range_validator,
     )
     intermediar_os_cylindric = models.DecimalField(
-        max_digits=5, decimal_places=2, null=True, blank=True
+        max_digits=5,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        validators=optical_range_validator,
     )
-    intermediar_os_axis = models.IntegerField(null=True, blank=True)
+    intermediar_os_axis = models.IntegerField(
+        null=True,
+        blank=True,
+        validators=axis_range_validator,
+    )
 
     intermediar_pupillary_distance = models.DecimalField(
-        max_digits=5, decimal_places=1, null=True, blank=True
+        max_digits=5,
+        decimal_places=1,
+        null=True,
+        blank=True,
+        validators=pd_range_validator,
     )
 
     class Meta:

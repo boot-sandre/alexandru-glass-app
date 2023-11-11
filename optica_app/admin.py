@@ -219,12 +219,12 @@ class PrescriptionDetailsInline(admin.StackedInline):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
+    list_display = ["user", "created_at", "updated_at"]
     inlines = [
         IdentityInline,
         ContactInline,
         InstitutionInline,
         PrescriptionDetailsInline,
-        # Add other inlines here
     ]
 
 
