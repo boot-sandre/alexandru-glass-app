@@ -241,7 +241,9 @@ class ProductAdmin(admin.ModelAdmin):
     list_display = ("__str__", "total_price")
 
 
-class ProductInline(admin.TabularInline):  # You can also use admin.StackedInline if you prefer
+class ProductInline(
+    admin.TabularInline
+):  # You can also use admin.StackedInline if you prefer
     model = Product
     extra = 1
 

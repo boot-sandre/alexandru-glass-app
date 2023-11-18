@@ -249,7 +249,7 @@ class PrescriptionDetail(models.Model):
 
 
 class Product(models.Model):
-    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='products')
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="products")
     total_price = models.DecimalField(max_digits=10, decimal_places=2)
 
     def __str__(self):
@@ -266,27 +266,28 @@ class Frame(models.Model):
 
 class GlassType(models.Model):
     DISTANCE_CHOICES = [
-        ('FAR', 'Far'),
-        ('MEDIUM', 'Medium'),
-        ('NEAR', 'Near'),
+        ("FAR", "Far"),
+        ("MEDIUM", "Medium"),
+        ("NEAR", "Near"),
     ]
     TREATMENT_CHOICES = [
-        ('POLARIZED', 'Polarized'),
-        ('UV_PROTECTION', 'UV Protection'),
-        ('ANTI_REFLECTIVE', 'Anti-Reflective'),
+        ("POLARIZED", "Polarized"),
+        ("UV_PROTECTION", "UV Protection"),
+        ("ANTI_REFLECTIVE", "Anti-Reflective"),
     ]
     product = models.OneToOneField(Product, on_delete=models.CASCADE)
     distance = models.CharField(
         max_length=100,
         choices=DISTANCE_CHOICES,
-        default='NEAR',
-        verbose_name="Distance"
+        default="NEAR",
+        verbose_name="Distance",
     )
     treatment = models.CharField(
         max_length=100,
         choices=TREATMENT_CHOICES,
         verbose_name="Tratament",
-        blank=True, null=True,
+        blank=True,
+        null=True,
     )
 
     def __str__(self):

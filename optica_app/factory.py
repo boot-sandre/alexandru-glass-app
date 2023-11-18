@@ -4,15 +4,23 @@
 # Copyright © Simon ANDRÉ <simon@emencia.com>
 # project: AlexandruOpticaApp
 # github: https://github.com/boot-sandre/alexandru-optica-app/
-import factory
-from factory import fuzzy
-
-from .models import Contact, Identity, Institution, Order, PrescriptionDetail, Lens, GlassType, Frame, Product
-
 # factories.py
 import factory
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password
+from factory import fuzzy
+
+from .models import (
+    Contact,
+    Frame,
+    GlassType,
+    Identity,
+    Institution,
+    Lens,
+    Order,
+    PrescriptionDetail,
+    Product,
+)
 
 User = get_user_model()
 
@@ -20,19 +28,19 @@ User = get_user_model()
 class UserFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = User
-        django_get_or_create = ('username',)
+        django_get_or_create = ("username",)
 
     username = factory.Sequence(lambda n: f"user_{n}")
     email = factory.LazyAttribute(lambda obj: f"{obj.username}@example.com")
-    first_name = factory.Faker('first_name')
-    last_name = factory.Faker('last_name')
-    password = make_password('password')
+    first_name = factory.Faker("first_name")
+    last_name = factory.Faker("last_name")
+    password = make_password("password")
     is_superuser = True
     is_staff = True
 
 
 class OrderFactory(factory.django.DjangoModelFactory):
-    user = factory.SubFactory('optica_app.factory.UserFactory')
+    user = factory.SubFactory("optica_app.factory.UserFactory")
 
     class Meta:
         model = Order
@@ -104,6 +112,28 @@ class PrescriptionDetailFactory(factory.django.DjangoModelFactory):
     intermediar_pupillary_distance = fuzzy.FuzzyDecimal(50.0, 70.0, 1)
 
 
+class FrameFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Frame
+    # Assuming a Frame has a title, set a default or use a sequence or Faker
+    title = factory.Faker('word')
+
+
+class GlassTypeFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = GlassType
+    # Use fuzzy to set a random choice for the distance and treatment fields
+    distance = fuzzy.FuzzyChoice(choices=[choice[0] for choice in GlassType.DISTANCE_CHOICES])
+    treatment = fuzzy.FuzzyChoice(choices=[choice[0] for choice in GlassType.TREATMENT_CHOICES])
+
+
+class LensFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Lens
+    # Use Faker to generate a text field for title
+    title = factory.Faker('text', max_nb_chars=200)
+
+
 class ProductFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Product
@@ -114,39 +144,14 @@ class ProductFactory(factory.django.DjangoModelFactory):
     @factory.post_generation
     def post_create(self, create, extracted, **kwargs):
         if not create:
-            # Simple build, do nothing.
             return
-
-        # Assuming that each Product should have one Frame, one GlassType, and one Lens
-        Frame.objects.create(product=self, title=f"Frame for product {self.pk}")
-        GlassType.objects.create(
-            product=self,
-            distance=fuzzy.FuzzyChoice([choice[0] for choice in GlassType.DISTANCE_CHOICES]).fuzz(),
-            treatment=fuzzy.FuzzyChoice([choice[0] for choice in GlassType.TREATMENT_CHOICES]).fuzz()
-        )
-        Lens.objects.create(product=self, title=f"Lens for product {self.pk}")
-
-
-class FrameFactory(factory.django.DjangoModelFactory):
-    class Meta:
-        model = Frame
-
-    product = factory.SubFactory(ProductFactory)
-    title = factory.Sequence(lambda n: f"Frame Title {n}")
-
-
-class GlassTypeFactory(factory.django.DjangoModelFactory):
-    class Meta:
-        model = GlassType
-
-    product = factory.SubFactory(ProductFactory)
-    distance = fuzzy.FuzzyChoice(choices=[choice[0] for choice in GlassType.DISTANCE_CHOICES])
-    treatment = fuzzy.FuzzyChoice(choices=[choice[0] for choice in GlassType.TREATMENT_CHOICES], getter=lambda c: c if c is not None else '')
-
-
-class LensFactory(factory.django.DjangoModelFactory):
-    class Meta:
-        model = Lens
-
-    product = factory.SubFactory(ProductFactory)
-    title = factory.Faker('text', max_nb_chars=200)
+        breakpoint()
+        # Check if the Product already has associated Frame, GlassType, and Lens
+        # This check prevents the IntegrityError by not attempting to create
+        # another related object if one already exists.
+        if not hasattr(self, 'frame'):
+            FrameFactory(product=self)
+        if not hasattr(self, 'glasstype'):
+            GlassTypeFactory(product=self)
+        if not hasattr(self, 'lens'):
+            LensFactory(product=self)
