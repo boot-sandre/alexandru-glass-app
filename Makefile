@@ -54,6 +54,10 @@ run:
 	$(PYTHON_VENV_EXE) manage.py runserver --settings=$(DJANGO_SETTINGS) $(DJANGO_SERV_ADDR)
 .PHONY: run
 
+shell:
+	$(PYTHON_VENV_EXE) manage.py shell --settings=$(DJANGO_SETTINGS)
+.PHONY: shell
+
 static:
 	mkdir -p static
 	$(PYTHON_VENV_EXE) manage.py collectstatic --settings=$(DJANGO_SETTINGS)
