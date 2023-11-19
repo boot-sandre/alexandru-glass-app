@@ -18,6 +18,9 @@ class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, null=True, editable=False)
     updated_at = models.DateTimeField(auto_now=True, editable=False)
 
+    def total_price(self):
+        return self.products.aggregate(models.Sum("price"))["price__sum"] or 0.00
+
     class Meta:
         verbose_name = "Order"
         verbose_name_plural = "Orders"
@@ -249,14 +252,25 @@ class PrescriptionDetail(models.Model):
 
 
 class Product(models.Model):
-    total_price = models.DecimalField(max_digits=10, decimal_places=2)
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="products")
+    price = models.DecimalField(
+        max_digits=10, decimal_places=2, validators=[MinValueValidator(0.00)]
+    )
+    frame = models.ForeignKey(
+        "Frame", on_delete=models.PROTECT, related_name="product_set"
+    )
+    glass_type = models.ForeignKey(
+        "GlassType", on_delete=models.PROTECT, related_name="product_set"
+    )
+    lens = models.ForeignKey(
+        "Lens", on_delete=models.PROTECT, related_name="product_set"
+    )
 
     def __str__(self):
-        return f"{self.frame.title} - {self.total_price}"
+        return f"{self.frame} - {self.glass_type} - {self.lens}"
 
 
 class Frame(models.Model):
-    product = models.OneToOneField(Product, on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
 
     def __str__(self):
@@ -264,17 +278,40 @@ class Frame(models.Model):
 
 
 class GlassType(models.Model):
-    product = models.OneToOneField(Product, on_delete=models.CASCADE)
-    distance = models.CharField(max_length=100)
-    near = models.CharField(max_length=100)
-    other = models.CharField(max_length=100)
+    DISTANCE_CHOICES = [
+        ("FAR", "Far"),
+        ("MEDIUM", "Medium"),
+        ("NEAR", "Near"),
+    ]
+    TREATMENT_CHOICES = [
+        ("POLARIZED", "Polarized"),
+        ("UV_PROTECTION", "UV Protection"),
+        ("ANTI_REFLECTIVE", "Anti-Reflective"),
+    ]
+
+    distance = models.CharField(
+        max_length=100,
+        choices=DISTANCE_CHOICES,
+        default="NEAR",
+        verbose_name="Distance",
+    )
+    treatment = models.CharField(
+        max_length=100,
+        choices=TREATMENT_CHOICES,
+        verbose_name="Tratament",
+        blank=True,
+        null=True,
+    )
 
     def __str__(self):
-        return f"{self.distance}, {self.near}, {self.other}"
+        distance_display = self.get_distance_display()
+        treatment_display = (
+            f", {self.get_treatment_display()}" if self.treatment else ""
+        )
+        return f"{distance_display}{treatment_display}"
 
 
 class Lens(models.Model):
-    product = models.OneToOneField(Product, on_delete=models.CASCADE)
     title = models.TextField()
 
     def __str__(self):

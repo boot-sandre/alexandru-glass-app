@@ -1,0 +1,14 @@
+{% extends "admin/change_form.html" %}
+{% load i18n admin_modify %}
+
+{% block inline_fieldsets %}{{ block.super }}{% endblock %}
+
+{% block after_related_objects %}
+    <div class="form-row field-total_price" style="text-align: right;">
+        <div>
+            <label>{% trans "Prix Total" %}:</label>
+            <div>{{ adminform.form.total_price }}</div>
+        </div>
+    </div>
+    {{ block.super }}
+{% endblock %}

@@ -88,7 +88,7 @@ tests_lf_pdb:
 .PHONY: tests_lf_pdb
 
 qa: black_diff flake
-.PHONY: check_qa
+.PHONY: qa
 
-ci: check_qa tests
+ci: qa tests
 .PHONY: ci
