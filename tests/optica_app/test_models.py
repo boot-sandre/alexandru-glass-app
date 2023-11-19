@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 import pytest
 
 from optica_app.factory import (
@@ -161,3 +163,46 @@ def test_voucher_line_creation():
     assert voucher_line.amount > 0
     assert voucher_line.payment_date is not None
     assert voucher_line.voucher is not None
+
+
+@pytest.mark.django_db
+def test_orders_total_price():
+    product1 = ProductFactory(price=100.00)
+    product2 = ProductFactory(price=200.00)
+    order = OrderFactory()
+    order.products.set([product1, product2])
+
+    voucher = VoucherFactory()
+    voucher.orders.add(order)
+
+    assert voucher.orders_total_price() == 300.00
+
+
+@pytest.mark.django_db
+def test_voucher_lines_total_amount():
+    voucher = VoucherFactory()
+    VoucherLineFactory(voucher=voucher, amount=150.00)
+    VoucherLineFactory(voucher=voucher, amount=50.00)
+
+    assert voucher.voucher_lines_total_amount() == 200.00
+
+
+@pytest.mark.django_db
+def test_voucher_rest_amount():
+    # Création de produits et d'une commande
+    product1 = ProductFactory(price=100.00)
+    product2 = ProductFactory(price=200.00)
+    order = OrderFactory()
+    order.products.set([product1, product2])
+
+    # Création d'un Voucher et ajout de la commande
+    voucher = VoucherFactory()
+    voucher.orders.add(order)
+
+    # Création des lignes de Voucher
+    VoucherLineFactory(voucher=voucher, amount=150.00)
+    VoucherLineFactory(voucher=voucher, amount=100.00)
+
+    # Le montant restant doit être la différence entre le total des commandes et le total des lignes de Voucher
+    expected_rest_amount = Decimal(300.00 - 250.00)  # 300.00 est la somme des prix des produits, 250.00 est la somme des lignes de Voucher
+    assert voucher.rest_amount() == expected_rest_amount

@@ -18,8 +18,8 @@ class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, null=True, editable=False)
     updated_at = models.DateTimeField(auto_now=True, editable=False)
 
-    def total_price(self):
-        return self.products.aggregate(models.Sum("price"))["price__sum"] or 0.00
+    def total_price(self) -> Decimal:
+        return Decimal(self.products.aggregate(models.Sum("price"))["price__sum"] or Decimal("0.00"))
 
     class Meta:
         verbose_name = "Order"
@@ -327,9 +327,18 @@ class Voucher(models.Model):
     orders = models.ManyToManyField(Order, related_name="vouchers")
     payment_method = models.TextField("Payment Method", choices=PAYMENT_CHOICES)
 
+    def orders_total_price(self) -> Decimal:
+        return Decimal(self.orders.aggregate(models.Sum("products__price"))["products__price__sum"] or Decimal("0.00"))
+
+    def voucher_lines_total_amount(self) -> Decimal:
+        return Decimal(self.voucher_lines.aggregate(models.Sum("amount"))["amount__sum"] or Decimal("0.00"))
+
+    def rest_amount(self) -> Decimal:
+        return Decimal(self.orders_total_price() - self.voucher_lines_total_amount())
+
 
 class VoucherLine(models.Model):
-    voucher = models.ForeignKey(Voucher, on_delete=models.PROTECT)
+    voucher = models.ForeignKey(Voucher, on_delete=models.PROTECT, related_name="voucher_lines")
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     payment_date = models.DateField()
     payment_ref = models.CharField(max_length=250, blank=True, null=True)
