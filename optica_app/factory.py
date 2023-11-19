@@ -21,7 +21,7 @@ from .models import (
     Lens,
     Order,
     PrescriptionDetail,
-    Product,
+    Product, Voucher, VoucherLine,
 )
 
 User = get_user_model()
@@ -151,3 +151,20 @@ class ProductFactory(factory.django.DjangoModelFactory):
     lens = factory.SubFactory(LensFactory)
 
     price = fuzzy.FuzzyDecimal(0.01, 1000.00, 2)
+
+
+class VoucherFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Voucher
+
+    payment_method = factory.Iterator(["CASH", "CARD", "IGC"])
+
+
+class VoucherLineFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = VoucherLine
+
+    voucher = factory.SubFactory(VoucherFactory)
+    amount = factory.Faker('pydecimal', right_digits=2, positive=True, min_value=1, max_value=10000)
+    payment_date = factory.Faker('date_this_decade')
+    payment_ref = factory.Faker('lexify', text='?????')

@@ -17,7 +17,7 @@ from .models import (
     Lens,
     Order,
     PrescriptionDetail,
-    Product,
+    Product, Voucher, VoucherLine,
 )
 
 
@@ -273,3 +273,16 @@ class OrderAdmin(admin.ModelAdmin):
         if obj:  # cela signifie que nous sommes en mode édition
             return readonly_fields + ("total_price",)
         return readonly_fields
+
+
+admin.site.register(VoucherLine)
+
+
+class VoucherLineInline(admin.TabularInline):
+    model = VoucherLine
+    extra = 1
+
+
+@admin.register(Voucher)
+class VoucherAdmin(admin.ModelAdmin):
+    inlines = [VoucherLineInline]

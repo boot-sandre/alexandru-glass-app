@@ -6,7 +6,7 @@ from optica_app.factory import (
     InstitutionFactory,
     OrderFactory,
     PrescriptionDetailFactory,
-    ProductFactory,
+    ProductFactory, VoucherFactory, VoucherLineFactory,
 )
 
 
@@ -145,3 +145,17 @@ def test_product_creation_with_related_entities():
         str(product)
         == f"{product.frame.title} - {product.glass_type} - {product.lens.title}"
     )
+
+
+@pytest.mark.django_db
+def test_voucher_creation():
+    voucher = VoucherFactory()
+    assert voucher.payment_method in ["CASH", "CARD", "IGC"]
+
+
+@pytest.mark.django_db
+def test_voucher_line_creation():
+    voucher_line = VoucherLineFactory()
+    assert voucher_line.amount > 0
+    assert voucher_line.payment_date is not None
+    assert voucher_line.voucher is not None

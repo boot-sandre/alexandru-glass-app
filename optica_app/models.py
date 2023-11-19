@@ -316,3 +316,20 @@ class Lens(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class Voucher(models.Model):
+    PAYMENT_CHOICES = [
+        ("CASH", "Cash"),
+        ("CARD", "Card"),
+        ("IGC", "ItsGetComplicated"),
+    ]
+    orders = models.ManyToManyField(Order, related_name="vouchers")
+    payment_method = models.TextField("Payment Method", choices=PAYMENT_CHOICES)
+
+
+class VoucherLine(models.Model):
+    voucher = models.ForeignKey(Voucher, on_delete=models.PROTECT)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    payment_date = models.DateField()
+    payment_ref = models.CharField(max_length=250, blank=True, null=True)
