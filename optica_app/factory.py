@@ -5,6 +5,8 @@
 # project: AlexandruOpticaApp
 # github: https://github.com/boot-sandre/alexandru-optica-app/
 # factories.py
+from random import choice as random_choice
+
 import factory
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password
@@ -115,23 +117,28 @@ class PrescriptionDetailFactory(factory.django.DjangoModelFactory):
 class FrameFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Frame
-    # Assuming a Frame has a title, set a default or use a sequence or Faker
-    title = factory.Faker('word')
+
+    title = factory.Sequence(lambda n: f"Frame {n}")
 
 
 class GlassTypeFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = GlassType
-    # Use fuzzy to set a random choice for the distance and treatment fields
-    distance = fuzzy.FuzzyChoice(choices=[choice[0] for choice in GlassType.DISTANCE_CHOICES])
-    treatment = fuzzy.FuzzyChoice(choices=[choice[0] for choice in GlassType.TREATMENT_CHOICES])
+
+    distance = fuzzy.FuzzyChoice([choice[0] for choice in GlassType.DISTANCE_CHOICES])
+
+    @factory.lazy_attribute
+    def treatment(self):
+        return random_choice(
+            [None] + [choice[0] for choice in GlassType.TREATMENT_CHOICES]
+        )
 
 
 class LensFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Lens
-    # Use Faker to generate a text field for title
-    title = factory.Faker('text', max_nb_chars=200)
+
+    title = factory.Faker("sentence", nb_words=4)
 
 
 class ProductFactory(factory.django.DjangoModelFactory):
@@ -139,19 +146,8 @@ class ProductFactory(factory.django.DjangoModelFactory):
         model = Product
 
     order = factory.SubFactory(OrderFactory)
-    total_price = fuzzy.FuzzyDecimal(0.01, 1000.00, 2)
+    frame = factory.SubFactory(FrameFactory)
+    glass_type = factory.SubFactory(GlassTypeFactory)
+    lens = factory.SubFactory(LensFactory)
 
-    @factory.post_generation
-    def post_create(self, create, extracted, **kwargs):
-        if not create:
-            return
-        breakpoint()
-        # Check if the Product already has associated Frame, GlassType, and Lens
-        # This check prevents the IntegrityError by not attempting to create
-        # another related object if one already exists.
-        if not hasattr(self, 'frame'):
-            FrameFactory(product=self)
-        if not hasattr(self, 'glasstype'):
-            GlassTypeFactory(product=self)
-        if not hasattr(self, 'lens'):
-            LensFactory(product=self)
+    price = fuzzy.FuzzyDecimal(0.01, 1000.00, 2)

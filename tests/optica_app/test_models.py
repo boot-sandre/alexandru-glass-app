@@ -2,11 +2,8 @@ import pytest
 
 from optica_app.factory import (
     ContactFactory,
-    FrameFactory,
-    GlassTypeFactory,
     IdentityFactory,
     InstitutionFactory,
-    LensFactory,
     OrderFactory,
     PrescriptionDetailFactory,
     ProductFactory,
@@ -129,25 +126,22 @@ def test_prescription_detail_creation():
 
 
 @pytest.mark.django_db
-def test_create_product_with_related_entities():
+def test_product_creation_with_related_entities():
     product = ProductFactory()
 
     assert product.pk is not None
-    assert product.frame is not None
-    assert product.glasstype is not None
-    assert product.lens is not None
-    assert str(product) == f"{product.frame.title} - {product.total_price}"
+    assert product.frame
+    assert product.glass_type
+    assert product.lens
+    assert product.price is not None
 
-
-@pytest.mark.django_db
-def test_create_product_with_related_entities():
-    # When using ProductFactory, related Frame, GlassType, and Lens should be created automatically
-    product = ProductFactory()
-
-    # Assertions to ensure everything was created correctly
-    assert product.pk is not None
-    assert hasattr(product, 'frame')
-    assert hasattr(product, 'glasstype')
-    assert hasattr(product, 'lens')
-    assert product.total_price is not None
-    assert str(product) == f"{product.frame.title} - {product.total_price}"
+    assert str(product.frame) == product.frame.title
+    assert str(product.lens) == product.lens.title
+    expected_glass_type_str = f"{product.glass_type.get_distance_display()}"
+    if product.glass_type.treatment:
+        expected_glass_type_str += f", {product.glass_type.get_treatment_display()}"
+    assert str(product.glass_type) == expected_glass_type_str
+    assert (
+        str(product)
+        == f"{product.frame.title} - {product.glass_type} - {product.lens.title}"
+    )

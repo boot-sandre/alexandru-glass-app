@@ -4,6 +4,7 @@
 # Copyright © Simon ANDRÉ <simon@emencia.com>
 # project: AlexandruOpticaApp
 # github: https://github.com/boot-sandre/alexandru-optica-app/
+from django import forms
 from django.contrib import admin
 from django.template.defaultfilters import truncatechars
 
@@ -217,40 +218,48 @@ class PrescriptionDetailsInline(admin.StackedInline):
     )
 
 
-class FrameInline(admin.StackedInline):
-    model = Frame
-    can_delete = False
-
-
-class GlassTypeInline(admin.StackedInline):
-    model = GlassType
-    can_delete = False
-
-
-class LensInline(admin.StackedInline):
-    model = Lens
-    can_delete = False
-
-
+@admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    inlines = [
-        FrameInline,
-        GlassTypeInline,
-        LensInline,
-    ]
-    list_display = ("__str__", "total_price")
+    list_display = ("__str__", "price")
 
 
-class ProductInline(
-    admin.TabularInline
-):  # You can also use admin.StackedInline if you prefer
+admin.site.register(Frame)
+admin.site.register(GlassType)
+admin.site.register(Lens)
+
+
+class ProductInline(admin.TabularInline):
     model = Product
     extra = 1
 
 
+class OrderAdminForm(forms.ModelForm):
+    class Meta:
+        model = Order
+        fields = "__all__"
+
+    def __init__(self, *args, **kwargs):
+        super(OrderAdminForm, self).__init__(*args, **kwargs)
+        if self.instance and self.instance.pk:
+            self.fields["total_price"] = forms.DecimalField(
+                disabled=True,
+                required=False,
+                decimal_places=2,
+                max_digits=10,
+                initial=self.instance.total_price(),
+            )
+
+
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ["user", "created_at", "updated_at"]
+    form = OrderAdminForm
+    change_form_template = "admin/optica_app/order/change_form.html"
+    fields = ["user"]
+    list_display = ["__str__", "user", "created_at", "updated_at", "total_price"]
+
+    class Meta:
+        model = Order
+
     inlines = [
         IdentityInline,
         ContactInline,
@@ -259,5 +268,8 @@ class OrderAdmin(admin.ModelAdmin):
         ProductInline,
     ]
 
-
-admin.site.register(Product, ProductAdmin)
+    def get_readonly_fields(self, request, obj=None):
+        readonly_fields = super(OrderAdmin, self).get_readonly_fields(request, obj)
+        if obj:  # cela signifie que nous sommes en mode édition
+            return readonly_fields + ("total_price",)
+        return readonly_fields
