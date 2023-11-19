@@ -6,7 +6,9 @@ from optica_app.factory import (
     InstitutionFactory,
     OrderFactory,
     PrescriptionDetailFactory,
-    ProductFactory, VoucherFactory, VoucherLineFactory,
+    ProductFactory,
+    VoucherFactory,
+    VoucherLineFactory,
 )
 
 

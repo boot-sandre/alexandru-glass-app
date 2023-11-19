@@ -21,7 +21,9 @@ from .models import (
     Lens,
     Order,
     PrescriptionDetail,
-    Product, Voucher, VoucherLine,
+    Product,
+    Voucher,
+    VoucherLine,
 )
 
 User = get_user_model()
@@ -165,6 +167,8 @@ class VoucherLineFactory(factory.django.DjangoModelFactory):
         model = VoucherLine
 
     voucher = factory.SubFactory(VoucherFactory)
-    amount = factory.Faker('pydecimal', right_digits=2, positive=True, min_value=1, max_value=10000)
-    payment_date = factory.Faker('date_this_decade')
-    payment_ref = factory.Faker('lexify', text='?????')
+    amount = factory.Faker(
+        "pydecimal", right_digits=2, positive=True, min_value=1, max_value=10000
+    )
+    payment_date = factory.Faker("date_this_decade")
+    payment_ref = factory.Faker("lexify", text="?????")

@@ -17,7 +17,9 @@ from .models import (
     Lens,
     Order,
     PrescriptionDetail,
-    Product, Voucher, VoucherLine,
+    Product,
+    Voucher,
+    VoucherLine,
 )
 
 
