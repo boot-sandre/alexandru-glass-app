@@ -1,0 +1,26 @@
+{% extends "admin/change_form.html" %}
+{% load i18n admin_modify %}
+
+{% block inline_fieldsets %}{{ block.super }}{% endblock %}
+
+{% block after_related_objects %}
+    <div class="form-row field-orders_total_price" style="text-align: right;">
+        <div>
+            <label>{% trans "Total price to pay (Orders):" %}:</label>
+            <div>{{ adminform.form.orders_total_price }}</div>
+        </div>
+    </div>
+    <div class="form-row field-voucher_lines_total_amount" style="text-align: right;">
+        <div>
+            <label>{% trans "Amount payed (Voucher):" %}:</label>
+            <div>{{ adminform.form.voucher_lines_total_amount }}</div>
+        </div>
+    </div>
+    <div class="form-row field-rest_amount" style="text-align: right;color: red;">
+        <div>
+            <label style="color: red;">{% trans "Rest to pay:" %}:</label>
+            <div>{{ adminform.form.rest_amount }}</div>
+        </div>
+    </div>
+    {{ block.super }}
+{% endblock %}

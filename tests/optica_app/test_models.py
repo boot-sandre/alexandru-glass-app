@@ -189,20 +189,16 @@ def test_voucher_lines_total_amount():
 
 @pytest.mark.django_db
 def test_voucher_rest_amount():
-    # Création de produits et d'une commande
     product1 = ProductFactory(price=100.00)
     product2 = ProductFactory(price=200.00)
     order = OrderFactory()
     order.products.set([product1, product2])
 
-    # Création d'un Voucher et ajout de la commande
     voucher = VoucherFactory()
     voucher.orders.add(order)
 
-    # Création des lignes de Voucher
     VoucherLineFactory(voucher=voucher, amount=150.00)
     VoucherLineFactory(voucher=voucher, amount=100.00)
 
-    # Le montant restant doit être la différence entre le total des commandes et le total des lignes de Voucher
-    expected_rest_amount = Decimal(300.00 - 250.00)  # 300.00 est la somme des prix des produits, 250.00 est la somme des lignes de Voucher
+    expected_rest_amount = Decimal(300.00 - 250.00)
     assert voucher.rest_amount() == expected_rest_amount

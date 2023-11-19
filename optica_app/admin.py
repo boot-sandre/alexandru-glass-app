@@ -285,6 +285,60 @@ class VoucherLineInline(admin.TabularInline):
     extra = 1
 
 
+class VoucherAdminForm(forms.ModelForm):
+    class Meta:
+        model = Voucher
+        fields = "__all__"
+
+    def __init__(self, *args, **kwargs):
+        super(VoucherAdminForm, self).__init__(*args, **kwargs)
+        if self.instance and self.instance.pk:
+            self.fields["orders_total_price"] = forms.DecimalField(
+                disabled=True,
+                required=False,
+                decimal_places=2,
+                max_digits=10,
+                initial=self.instance.orders_total_price(),
+            )
+            self.fields["voucher_lines_total_amount"] = forms.DecimalField(
+                disabled=True,
+                required=False,
+                decimal_places=2,
+                max_digits=10,
+                initial=self.instance.voucher_lines_total_amount(),
+            )
+            self.fields["rest_amount"] = forms.DecimalField(
+                disabled=True,
+                required=False,
+                decimal_places=2,
+                max_digits=10,
+                initial=self.instance.rest_amount(),
+            )
+
+
 @admin.register(Voucher)
 class VoucherAdmin(admin.ModelAdmin):
+    class Meta:
+        model = Voucher
+
+    fields = ["orders", "payment_method"]
+
+    form = VoucherAdminForm
     inlines = [VoucherLineInline]
+    change_form_template = "admin/optica_app/voucher/change_form.html"
+    list_display = [
+        "__str__",
+        "orders_total_price",
+        "voucher_lines_total_amount",
+        "rest_amount",
+    ]
+
+    def get_readonly_fields(self, request, obj=None):
+        readonly_fields = super(VoucherAdmin, self).get_readonly_fields(request, obj)
+        if obj:
+            return readonly_fields + (
+                "orders_total_price",
+                "voucher_lines_total_amount",
+                "rest_amount",
+            )
+        return readonly_fields
