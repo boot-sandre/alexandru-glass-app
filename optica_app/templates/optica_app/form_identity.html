@@ -1,0 +1,15 @@
+<!-- optica_app/form_identity.html -->
+{% extends 'optica_app/base.html' %}
+
+{% block content %}
+    <div class="flex justify-center h-screen">
+        <div class="w-full max-w-xs">
+            <form action="identity" method="POST" class="bg-gray-300 shadow-md rounded px-4 pt-6 pb-8 mb-4">
+        {% csrf_token %}
+                <h1 class="font-bold text-xl mb-2">Identity Form</h1>
+        {{ form.as_p }}
+                <input type="submit" value="Submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+    </form>
+        </div>
+    </div>
+{% endblock %}

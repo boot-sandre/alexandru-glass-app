@@ -6,8 +6,9 @@
 # github: https://github.com/boot-sandre/alexandru-optica-app/
 
 from django.contrib import admin
-from django.urls import path
+from django.urls import include, path
 
 urlpatterns = [
-    path("", admin.site.urls),
+    path("admin/", admin.site.urls),
+    path("optica/", include("optica_app.urls")),
 ]
