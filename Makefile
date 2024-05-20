@@ -1,5 +1,5 @@
-PYTHON_VERSION := 3.11
-PYTHON_BLACK_VERSION := py311
+PYTHON_VERSION := 3.12
+PYTHON_BLACK_VERSION := py312
 PYTHON_GLOBAL_EXE := python$(PYTHON_VERSION)
 VENV := .venv
 PYTHON_VENV_EXE := $(VENV)/bin/python
@@ -12,6 +12,7 @@ DJANGO_SETTINGS := alexandru_optica_app.settings.development
 DJANGO_SETTINGS_TEST := alexandru_optica_app.settings.testing
 DJANGO_SERV_ADDR := localhost:8000
 DB_DEV := db.sqlite3
+NPM_EXE := npm
 
 
 venv:
@@ -26,11 +27,29 @@ install_dev: venv
 	$(PIP_VENV_EXE) install -r requirements-dev.txt -r requirements.txt
 .PHONY: install_dev
 
+static:
+	mkdir -p static
+.PHONY: static
+
+install_front: static
+	npm install
+.PHONY: install_front
+
+front_build:
+	npm run dev
+	$(PYTHON_VENV_EXE) manage.py collectstatic --settings=$(DJANGO_SETTINGS)  --noinput -c -l -v 2
+.PHONY: front_build
+
+clean_front:
+	rm -rf node_modules/
+	rm -rf static/
+.PHONY: clean_front
+
 freeze_requirements: venv
 	$(PIP_VENV_EXE) freeze --all > requirements-freeze.txt
 .PHONY: freeze_requirements
 
-clean:
+clean: clean_front
 	rm -rf $(VENV)
 	find . -type f -name '*.pyc' -delete
 .PHONY: clean
@@ -57,11 +76,6 @@ run:
 shell:
 	$(PYTHON_VENV_EXE) manage.py shell --settings=$(DJANGO_SETTINGS)
 .PHONY: shell
-
-static:
-	mkdir -p static
-	$(PYTHON_VENV_EXE) manage.py collectstatic --settings=$(DJANGO_SETTINGS)
-.PHONY: static
 
 black_diff:
 	$(BLACK_VENV_EXE) -t $(PYTHON_BLACK_VERSION) --diff .
@@ -96,3 +110,7 @@ qa: black_diff flake
 
 ci: qa tests
 .PHONY: ci
+
+ci_full: clean install install_dev install_front front_build qa tests
+.PHONY: ci_full
+

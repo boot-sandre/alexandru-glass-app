@@ -75,3 +75,7 @@ dmypy.json
 .pytype/
 cython_debug/
 .idea/
+node_modules
+/optica_app/static/optica_app/css/*.min.css
+static/
+.vscode/

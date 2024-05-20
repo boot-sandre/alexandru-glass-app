@@ -9,3 +9,6 @@ It offers a seamless, high-quality service experience, beneficial for both the p
 and the client. By integrating essential tools for eye care and sales within a single platform.
 
 Alexandru optica app simplifies and enhances the at-home optician and eyewear sales experience.
+
+
+    username = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'template_name': 'text_input.html'}))
