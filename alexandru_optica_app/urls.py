@@ -4,11 +4,12 @@
 # Copyright © Simon ANDRÉ <simon@emencia.com>
 # project: AlexandruOpticaApp
 # github: https://github.com/boot-sandre/alexandru-optica-app/
-
+from django.conf import settings
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 
 urlpatterns = [
-    path("admin/", admin.site.urls),
-    path("optica/", include("optica_app.urls")),
-]
+    path("admin/", view=admin.site.urls),
+    path("", view=include("optica_app.urls")),
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
