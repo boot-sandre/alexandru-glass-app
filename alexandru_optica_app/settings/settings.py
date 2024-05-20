@@ -44,6 +44,8 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "alexandru_optica_app",
     "optica_app",
+    "django.forms",
+    "formtools",
 ]
 
 MIDDLEWARE = [
@@ -124,9 +126,8 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 
-# STATIC_ROOT = '/home/alexandru-optica/www/django/static/'
-
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
