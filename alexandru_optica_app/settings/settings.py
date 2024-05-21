@@ -16,7 +16,9 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
+import multiprocessing
 from pathlib import Path
+import structlog
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
@@ -46,6 +48,7 @@ INSTALLED_APPS = [
     "optica_app",
     "django.forms",
     "formtools",
+    "django_structlog",
 ]
 
 MIDDLEWARE = [
@@ -56,6 +59,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "django_structlog.middlewares.RequestMiddleware",
 ]
 
 ROOT_URLCONF = "alexandru_optica_app.urls"
@@ -131,3 +135,107 @@ STATIC_URL = "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
+
+
+def extract_from_record(_, __, event_dict):
+    """
+    Extract thread and process names and add them to the event dict.
+    """
+    record = event_dict["_record"]
+    event_dict["thread_name"] = record.threadName
+    event_dict["process_name"] = record.processName
+    return event_dict
+
+
+timestamper = structlog.processors.TimeStamper(fmt="%Y-%m-%d %H:%M:%S")
+legacy_pre_chain = [
+    structlog.stdlib.add_log_level,
+    structlog.stdlib.ExtraAdder(),
+    timestamper,
+]
+json_pre_chain = [
+    structlog.contextvars.merge_contextvars,
+    structlog.processors.TimeStamper(fmt="iso"),
+    structlog.stdlib.add_logger_name,
+    structlog.stdlib.add_log_level,
+    structlog.stdlib.PositionalArgumentsFormatter(),
+]
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": True,
+    "formatters": {
+        "struct_json": {
+            "()": structlog.stdlib.ProcessorFormatter,
+            "processor": structlog.processors.JSONRenderer(),
+            "foreign_pre_chain": json_pre_chain,
+        },
+        "struct_legacy": {
+            "()": structlog.stdlib.ProcessorFormatter,
+            "processors": [
+                extract_from_record,
+                structlog.stdlib.ProcessorFormatter.remove_processors_meta,
+                structlog.dev.ConsoleRenderer(colors=False),
+            ],
+            "foreign_pre_chain": legacy_pre_chain,
+        },
+        "struct_legacy_color": {
+            "()": structlog.stdlib.ProcessorFormatter,
+            "processors": [
+                extract_from_record,
+                structlog.stdlib.ProcessorFormatter.remove_processors_meta,
+                structlog.dev.ConsoleRenderer(colors=True),
+            ],
+            "foreign_pre_chain": legacy_pre_chain,
+        },
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "struct_legacy",
+        },
+        "loki": {
+            "queue": multiprocessing.Queue(-1),
+            "class": "logging_loki.LokiQueueHandler",
+            "formatter": "struct_json",
+            "url": "http://0.0.0.0:3100/loki/api/v1/push",
+            "tags": {"application": "zipextractor"},
+            "version": "1",
+        },
+    },
+    "root": {
+        "handlers": ["console", "loki"],
+        "level": "INFO",
+    },
+    "loggers": {
+        "django": {
+            "propagate": True,
+        },
+        "django.utils.autoreload": {
+            "level": "INFO",
+        },
+        "django_structlog": {
+            "propagate": True,
+        },
+        "django_structlog.middlewares.request": {},
+    },
+}
+
+structlog.configure(
+    processors=[
+        structlog.contextvars.merge_contextvars,
+        structlog.stdlib.filter_by_level,
+        structlog.processors.TimeStamper(fmt="iso"),
+        structlog.stdlib.add_logger_name,
+        structlog.stdlib.add_log_level,
+        structlog.stdlib.PositionalArgumentsFormatter(),
+        timestamper,
+        structlog.processors.StackInfoRenderer(),
+        structlog.processors.format_exc_info,
+        structlog.processors.UnicodeDecoder(),
+        structlog.stdlib.ProcessorFormatter.wrap_for_formatter,
+    ],
+    logger_factory=structlog.stdlib.LoggerFactory(),
+    wrapper_class=structlog.stdlib.BoundLogger,
+    cache_logger_on_first_use=True,
+)
